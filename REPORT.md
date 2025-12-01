@@ -26,6 +26,8 @@ The system consists of the following components:
 
 ## 3. Ceph Cluster Setup
 
+What is Ceph? Ceph is a distributed storage system that provides high availability and scalability. It uses a cluster of OSDs to store data and can be used for various storage needs, including block storage, object storage, and file systems.
+
 To ensure redundancy and fault tolerance, three loop-backed OSDs (2GB each) were created and added to MicroCeph. Pools for CephFS metadata and data were initialized with replication size set to 3. The filesystem was mounted locally using the `client.admin` key.
 
 Key commands:
@@ -33,8 +35,30 @@ Key commands:
 sudo microceph init
 sudo dd if=/dev/zero of=/var/local/osd-1.img ...
 sudo microceph disk add /dev/loopX
+```
+
+![Terminal Screenshot](docs/figure1.png)
+
+The Ceph cluster was verified using the `sudo microceph.ceph -s` command, which confirmed the health and status of the OSDs and pools.
+```bash
+sudo microceph.ceph -s
+```
+
+![Terminal Screenshot](docs/figure2.png)
+
+
+The following commands were used to create the CephFS pools and set their replication size:
+```bash
+sudo microceph.ceph osd pool create cephfs_data 8
+sudo microceph.ceph osd pool create cephfs_meta 8
+sudo microceph.ceph osd pool application enable cephfs_data cephfs
+sudo microceph.ceph osd pool application enable cephfs_meta cephfs
+sudo microceph.ceph osd pool set cephfs_data size 3
+sudo microceph.ceph osd pool set cephfs_meta size 3
 sudo microceph.ceph fs new mycephfs cephfs_meta cephfs_data
 ```
+
+![Terminal Screenshot](docs/figure3.png)
 
 ---
 
